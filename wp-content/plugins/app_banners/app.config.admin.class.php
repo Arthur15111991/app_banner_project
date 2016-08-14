@@ -18,6 +18,7 @@ if(!class_exists('AppConfigManage')) {
             $ab_table = "dp24_apps_banners";
             $apps_string = "'" . implode("','", array_keys($available_apps)) . "'";
             $apps = $wpdb->get_results("SELECT * FROM {$ab_table} WHERE app IN ($apps_string) ORDER BY platform", ARRAY_A);
+
             $_apps = array();
             foreach ($apps as $key => $app) {
                 $_apps[$app['app']][$app['platform']][] = $app;
@@ -25,14 +26,32 @@ if(!class_exists('AppConfigManage')) {
             foreach ($_apps as $key => $app) {
                 foreach ($app as $_key => $platform) {
                     $text = json_encode($platform);
-                    $file_path = get_home_path() . 'wp-content/plugins/user_banners/config_files/';
+                    $file_path = get_home_path() . 'wp-content/plugins/app_banners/config_files/';
                     $file_name = $_key . '.' . $key . '.php';
                     $fp = fopen($file_path . $file_name, "w");
                     fwrite($fp, $text);
                     fclose($fp);
+                    self::fn_transfer_config_file($file_path, $file_name);
                 }
             }
             return true;
+        }
+
+        private function fn_transfer_config_file($file_path, $file_name)
+        {
+            $file_name_local = $file_path . $file_name;
+            $ftp_server	= 'your host';
+            $ftp_port = 21;
+            $ftp_file = $file_name;
+            $ftp_user_name = 'your username';
+            $ftp_user_pass = 'your password';
+            $ftp = ftp_connect($ftp_server, $ftp_port, 20);
+            $login_result = ftp_login($ftp, $ftp_user_name, $ftp_user_pass);
+            ftp_pasv($ftp, true);
+            if(!ftp_put($ftp, $ftp_file, $file_name_local, FTP_BINARY)) {
+                print_r('ERROR FTP');
+            }
+            ftp_close($ftp);
         }
 
         public function page() 
