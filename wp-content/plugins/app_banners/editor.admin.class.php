@@ -45,8 +45,6 @@ if(!class_exists('BannersEdit')) {
             return $banner_id;
         }
 
-
-
         private function fn_get_banner_data($wpdb, $banner_id)
         {
             $b_table = "dp24_banners";
@@ -62,6 +60,12 @@ if(!class_exists('BannersEdit')) {
             return $app_banner_data;
         }
 
+        private function fn_delete_app_banner_link($wpdb, $link_id)
+        {
+            $ab_table = "dp24_apps_banners";
+            return $wpdb->delete($ab_table, array('id' => $link_id));
+        }
+
         public function page()
         {
             global $wpdb;
@@ -74,6 +78,10 @@ if(!class_exists('BannersEdit')) {
             $mode = 'banner_add';		
         }
 
+        if (isset($_GET['action'])) {
+            $action = $_GET['action'];
+        }
+
         if (isset($_GET['item'])) {
             $item = $_GET['item'];
         } else {
@@ -84,6 +92,11 @@ if(!class_exists('BannersEdit')) {
             $is_update = (!empty($_POST['banner_data']['id'])) ? true : false;
             self::fn_update_banner_date($wpdb, $_POST['banner_data'], $_POST['banner_data']['id'], $_POST['link_data'], $is_update);
         }
+
+        if (isset($action) && $action == 'delete_link') {
+            self::fn_delete_app_banner_link($wpdb, $_GET['link_id']);
+        }
+
 
         if ($mode == 'edit') {
             $banner_data = self::fn_get_banner_data($wpdb, $item);
@@ -148,6 +161,11 @@ if(!class_exists('BannersEdit')) {
                                 <input type="text" id="order_by[]" name="link_data[order_by][]" placeholder="order by" value="<?php echo $value['orderBy'];?>">
                                 <input type="checkbox" name="link_data[is_active][]" id="is_active" value="1" <?php checked(1, $value['isActive']); ?> >
                                 <label for="is_active"><?php _e('status', SAM_DOMAIN); ?></label>
+                                <p>
+                                    <span class="delete"><a href="<?php echo admin_url('admin.php'); ?>?page=banner-edit&mode=edit&item=<?php echo $item; ?>&action=delete_link&link_id=<?php echo $value['id']; ?>"><?php _e('Remove link', BANNER_DOMAIN);?></a></span>
+                                </p>
+
+
                             </div>
                         <?php } ?>
 
@@ -185,8 +203,6 @@ if(!class_exists('BannersEdit')) {
                 });
             /* ]]> */
             </script>
-
-
         </div>
         <?php
         }
