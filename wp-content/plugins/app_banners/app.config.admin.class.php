@@ -31,7 +31,9 @@ if(!class_exists('AppConfigManage')) {
                     $fp = fopen($file_path . $file_name, "w");
                     fwrite($fp, $text);
                     fclose($fp);
-                    self::fn_transfer_config_file($file_path, $file_name);
+                    if (!self::fn_transfer_config_file($file_path, $file_name)) {
+                        return;
+                    }
                 }
             }
             return true;
@@ -40,7 +42,7 @@ if(!class_exists('AppConfigManage')) {
         private function fn_transfer_config_file($file_path, $file_name)
         {
             $file_name_local = $file_path . $file_name;
-            $ftp_server	= 'your host';
+            $ftp_server = 'your host';
             $ftp_port = 21;
             $ftp_file = $file_name;
             $ftp_user_name = 'your username';
@@ -50,8 +52,11 @@ if(!class_exists('AppConfigManage')) {
             ftp_pasv($ftp, true);
             if(!ftp_put($ftp, $ftp_file, $file_name_local, FTP_BINARY)) {
                 print_r('ERROR FTP');
+                ftp_close($ftp);
+                return false;
             }
             ftp_close($ftp);
+            return true;
         }
 
         public function page() 
