@@ -4,6 +4,49 @@ if(!class_exists('BannersEdit')) {
 
     class BannersEdit 
     {
+
+        private function fn_update_banner_date($wpdb, $banner_data, $banner_id = 0, $app_banner_data = array(), $is_update = false)
+        {
+            $b_table = "dp24_banners";
+            $ab_table = "dp24_apps_banners";
+            $post_data = array(
+                'name' => stripslashes($banner_data['name']),
+                'imageName' => stripslashes($banner_data['image_name']),
+                'link' => stripslashes($banner_data['link']),
+                'comment' => stripslashes($banner_data['comments'])
+            );
+            $formatRow = array( '%s', '%s', '%s', '%s');
+            if ($is_update) {
+                $wpdb->update($b_table, $post_data, array('id' => $banner_id), $formatRow);	
+            } else {
+                $wpdb->insert($b_table, $post_data, $formatRow);
+                $banner_id = $wpdb->insert_id;
+            }
+
+            for ($i = 0; $i < count($app_banner_data['platform']); $i++) {
+                if (empty($app_banner_data['link'][$i]) || empty($app_banner_data['order_by'][$i])) {
+                    continue;
+                }
+                $insertRows = array (
+                    'bannerId' => $banner_id,
+                    'app' => $app_banner_data['app'][$i],
+                    'platform' => $app_banner_data['platform'][$i],
+                    'link' => $app_banner_data['link'][$i],
+                    'orderBy' => $app_banner_data['order_by'][$i],
+                    'isActive' => (empty($app_banner_data['is_active'][$i])) ? false : true,
+                );
+                $formatRow = array( '%d', '%s', '%s', '%s', '%d', '%d');
+                if (!empty($app_banner_data['link_id'][$i])) {
+                    $wpdb->update($ab_table, $insertRows, array('id' => $app_banner_data['link_id'][$i] ), $formatRow);
+                } else {
+                    $wpdb->insert($ab_table, $insertRows, $formatRow);	
+                }
+            }
+            return $banner_id;
+        }
+
+
+
         private function fn_get_banner_data($wpdb, $banner_id)
         {
             $b_table = "dp24_banners";
@@ -35,6 +78,11 @@ if(!class_exists('BannersEdit')) {
             $item = $_GET['item'];
         } else {
             $item = null;
+        }
+
+        if(isset($_POST['update_banner'])) {
+            $is_update = (!empty($_POST['banner_data']['id'])) ? true : false;
+            self::fn_update_banner_date($wpdb, $_POST['banner_data'], $_POST['banner_data']['id'], $_POST['link_data'], $is_update);
         }
 
         if ($mode == 'edit') {
@@ -81,7 +129,7 @@ if(!class_exists('BannersEdit')) {
                 <div id="app_links" style="float:right; max-width:390px">
                     <div class="container">
                         <?php if ($mode == 'edit') foreach ($app_banner_data as $key => $value) { ?>
-                            <div id="link_data" style="border: 1px solid green; margin:5px; padding: 10px; text-align: center;">
+                            <div style="border: 1px solid green; margin:5px; padding: 10px; text-align: center;">
                                 <input type="hidden" name="link_data[link_id][]" value="<?php echo $value['id']?>">
                                 <select id="platform[]" name="link_data[platform][]">
                                     <option <?php if ($value['platform'] == 'android') {?> selected <?php } ?> value="android">android</option>
@@ -102,9 +150,43 @@ if(!class_exists('BannersEdit')) {
                                 <label for="is_active"><?php _e('status', SAM_DOMAIN); ?></label>
                             </div>
                         <?php } ?>
+
+                        <div id="link_data" style="border: 1px solid green; margin:5px; padding: 10px; text-align: center;">
+                            <h2><?php _e('New app link', BANNER_DOMAIN); ?></h2>
+                            <input type="hidden" value="" name="link_data[link_id][]" value="">
+                            <select id="platform[]" name="link_data[platform][]">
+                                <option value="android">android</option>
+                                <option value="ios">ios</option>
+                                <option value="windowsphone">windowsphone</option>
+                                <option value="amazon">amazon</option>
+                            </select>
+                            <select id="app[]" name="link_data[app][]">
+                                <option value="drumpads24">drumpads24</option>
+                                <option value="dubstepdrumpads24">dubstepdrumpads24</option>
+                                <option value="electrodrumpads24">electrodrumpads24</option>
+                                <option value="hiphopdrumpads24">hiphopdrumpads24</option>
+                                <option value="trapdrumpads24">trapdrumpads24</option>
+                            </select>
+                            <input type="text" id="link[]" name="link_data[link][]" value="" placeholder="link">
+                            <input type="text" id="order_by[]" name="link_data[order_by][]" value="" placeholder="order by">
+                            <input type="checkbox" name="link_data[is_active][]" id="is_active[]">
+                            <label for="is_active[]"><?php _e('status', SAM_DOMAIN); ?></label>
+                        </div>
                     </div>
+
+                    <button type="button" id="clone_button"><?php _e('Add_link', BANNER_DOMAIN) ?></button>
                 </div>
             </form>
+
+            <script type="text/javascript">
+            /* <![CDATA[ */
+                jQuery( "#clone_button" ).click(function() {
+                    jQuery('#link_data').clone().appendTo('.container');
+                });
+            /* ]]> */
+            </script>
+
+
         </div>
         <?php
         }
