@@ -77,6 +77,33 @@ if(!class_exists('BannersEdit')) {
                         <?php _e('Save', BANNER_DOMAIN) ?>
                     </button>
                 </div>
+
+                <div id="app_links" style="float:right; max-width:390px">
+                    <div class="container">
+                        <?php if ($mode == 'edit') foreach ($app_banner_data as $key => $value) { ?>
+                            <div id="link_data" style="border: 1px solid green; margin:5px; padding: 10px; text-align: center;">
+                                <input type="hidden" name="link_data[link_id][]" value="<?php echo $value['id']?>">
+                                <select id="platform[]" name="link_data[platform][]">
+                                    <option <?php if ($value['platform'] == 'android') {?> selected <?php } ?> value="android">android</option>
+                                    <option <?php if ($value['platform'] == 'ios') { ?> selected <?php } ?> value="ios">ios</option>
+                                    <option <?php if ($value['platform'] == 'windowsphone') { ?> selected <?php } ?>  value="windowsphone">windowsphone</option>
+                                    <option <?php if ($value['platform'] == 'amazon') { ?> selected <?php } ?> value="amazon">amazon</option>
+                                </select>
+                                <select id="app[]" name="link_data[app][]">
+                                    <option <?php if ($value['app'] == 'drumpads24') {?> selected <?php } ?> value="drumpads24">drumpads24</option>
+                                    <option <?php if ($value['app'] == 'dubstepdrumpads24') {?> selected <?php } ?> value="dubstepdrumpads24">dubstepdrumpads24</option>
+                                    <option <?php if ($value['app'] == 'electrodrumpads24') {?> selected <?php } ?> value="electrodrumpads24">electrodrumpads24</option>
+                                    <option <?php if ($value['app'] == 'hiphopdrumpads24') {?> selected <?php } ?> value="hiphopdrumpads24">hiphopdrumpads24</option>
+                                    <option <?php if ($value['app'] == 'trapdrumpads24') {?> selected <?php } ?> value="trapdrumpads24">trapdrumpads24</option>
+                                </select>
+                                <input type="text" id="link[]" name="link_data[link][]" placeholder="link" value="<?php echo $value['link'];?>">
+                                <input type="text" id="order_by[]" name="link_data[order_by][]" placeholder="order by" value="<?php echo $value['orderBy'];?>">
+                                <input type="checkbox" name="link_data[is_active][]" id="is_active" value="1" <?php checked(1, $value['isActive']); ?> >
+                                <label for="is_active"><?php _e('status', SAM_DOMAIN); ?></label>
+                            </div>
+                        <?php } ?>
+                    </div>
+                </div>
             </form>
         </div>
         <?php
