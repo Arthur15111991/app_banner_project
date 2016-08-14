@@ -26,9 +26,9 @@ if (!class_exists('AppBanners' && class_exists('AppBanners'))) {
 
         public function fn_manage_banners() 
         {
-            //include_once('list.admin.class.php');
-            //$list = new BannersManage();
-            //$list->page();
+            include_once('list.admin.class.php');
+            $list = new BannersManage();
+            $list->page();
         }        
     }
 }
