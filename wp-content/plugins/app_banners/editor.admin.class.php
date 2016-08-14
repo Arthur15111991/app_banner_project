@@ -164,8 +164,6 @@ if(!class_exists('BannersEdit')) {
                                 <p>
                                     <span class="delete"><a href="<?php echo admin_url('admin.php'); ?>?page=banner-edit&mode=edit&item=<?php echo $item; ?>&action=delete_link&link_id=<?php echo $value['id']; ?>"><?php _e('Remove link', BANNER_DOMAIN);?></a></span>
                                 </p>
-
-
                             </div>
                         <?php } ?>
 

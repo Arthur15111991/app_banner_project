@@ -3,9 +3,21 @@
 if(!class_exists('BannersManage')) {
 class BannersManage
 {
+    private function fn_delete_banner($wpdb, $banner_id)
+    {
+        $b_table = "dp24_banners";
+        $ab_table = "dp24_apps_banners";
+        $wpdb->delete($b_table, array('id' => $banner_id));
+       return $wpdb->delete($ab_table, array('bannerId' => $banner_id));
+    }
+
     public function page() 
     {
         global $wpdb;
+
+        if (!empty($_GET['mode']) && $_GET['mode'] == 'delete') {
+            self::fn_delete_banner($wpdb, $_GET['item']);
+        }
 
         $b_table = "dp24_banners";?>
         <div class='wrap'>
@@ -28,6 +40,7 @@ class BannersManage
                     <tr class="<?php echo (($i & 1) ? 'alternate' : ''); ?>">
                         <td class="post-title column-title"><?php echo $banner['id']; ?></td>
                         <td class="post-title column-title"><strong><a href="<?php echo admin_url('admin.php'); ?>?page=banner-edit&mode=edit&item=<?php echo $banner['id']; ?>"><?php echo $banner['name'];?></a></strong>
+                            <span class="delete"><a href="<?php echo admin_url('admin.php'); ?>?page=app-banners&mode=delete&item=<?php echo $banner['id']; ?>"><?php _e('Remove', BANNER_DOMAIN);?></a></span>
                         </td>
                     </tr>
                 <?php } ?>
