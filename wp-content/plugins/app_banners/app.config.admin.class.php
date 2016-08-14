@@ -13,6 +13,28 @@ if(!class_exists('AppConfigManage')) {
             return $enum;
         }
 
+        private function fn_create_config_files($wpdb, $available_apps)
+        {
+            $ab_table = "dp24_apps_banners";
+            $apps_string = "'" . implode("','", array_keys($available_apps)) . "'";
+            $apps = $wpdb->get_results("SELECT * FROM {$ab_table} WHERE app IN ($apps_string) ORDER BY platform", ARRAY_A);
+            $_apps = array();
+            foreach ($apps as $key => $app) {
+                $_apps[$app['app']][$app['platform']][] = $app;
+            }
+            foreach ($_apps as $key => $app) {
+                foreach ($app as $_key => $platform) {
+                    $text = json_encode($platform);
+                    $file_path = get_home_path() . 'wp-content/plugins/user_banners/config_files/';
+                    $file_name = $_key . '.' . $key . '.php';
+                    $fp = fopen($file_path . $file_name, "w");
+                    fwrite($fp, $text);
+                    fclose($fp);
+                }
+            }
+            return true;
+        }
+
         public function page() 
         {
             global $wpdb;  			
