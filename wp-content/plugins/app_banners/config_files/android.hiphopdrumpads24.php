@@ -1,1 +1,0 @@
-[{"id":"33","bannerId":"12","app":"hiphopdrumpads24","platform":"android","link":"https:\/\/bnc.lt\/EIVg\/amcM8JKDhp","orderBy":"90","isActive":"1"},{"id":"37","bannerId":"13","app":"hiphopdrumpads24","platform":"android","link":"https:\/\/bnc.lt\/DrumPads24Xmas2015AndroidBanner","orderBy":"100","isActive":"0"}]

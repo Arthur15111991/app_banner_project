@@ -13,10 +13,12 @@ class BannersManage
 
     public function page() 
     {
+        //if (isset($_GET['noheader']))
+            //require_once(ABSPATH . 'wp-admin/admin-header.php');
         global $wpdb;
 
         if (!empty($_GET['mode']) && $_GET['mode'] == 'delete') {
-            self::fn_delete_banner($wpdb, $_GET['item']);
+            self::fn_delete_banner($wpdb, $_GET['item_id']);
         }
 
         $b_table = "dp24_banners";?>
@@ -34,13 +36,13 @@ class BannersManage
             </thead>
             <body>
             <?php 
-                $bSql = "SELECT id, name FROM {$b_table}";
-                $banners = $wpdb->get_results($bSql, ARRAY_A);
+                $b_sql = "SELECT id, name FROM {$b_table} ORDER BY id";
+                $banners = $wpdb->get_results($b_sql, ARRAY_A);
                 foreach ($banners as $i => $banner) { ?>
                     <tr class="<?php echo (($i & 1) ? 'alternate' : ''); ?>">
                         <td class="post-title column-title"><?php echo $banner['id']; ?></td>
-                        <td class="post-title column-title"><strong><a href="<?php echo admin_url('admin.php'); ?>?page=banner-edit&mode=edit&item=<?php echo $banner['id']; ?>"><?php echo $banner['name'];?></a></strong>
-                            <span class="delete"><a href="<?php echo admin_url('admin.php'); ?>?page=app-banners&mode=delete&item=<?php echo $banner['id']; ?>"><?php _e('Remove', BANNER_DOMAIN);?></a></span>
+                        <td class="post-title column-title"><strong><a href="<?php echo admin_url('admin.php'); ?>?page=banner-edit&mode=edit&item_id=<?php echo $banner['id']; ?>"><?php echo $banner['name'];?></a></strong>
+                            <span class="delete"><a href="<?php echo admin_url('admin.php'); ?>?page=app-banners&mode=delete&item_id=<?php echo $banner['id']; ?>"><?php _e('Remove', BANNER_DOMAIN);?></a></span>
                         </td>
                     </tr>
                 <?php } ?>

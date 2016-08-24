@@ -16,8 +16,9 @@ if(!class_exists('AppConfigManage')) {
         private function fn_create_config_files($wpdb, $available_apps)
         {
             $ab_table = "dp24_apps_banners";
+            $b_table = "dp24_banners";
             $apps_string = "'" . implode("','", array_keys($available_apps)) . "'";
-            $apps = $wpdb->get_results("SELECT * FROM {$ab_table} WHERE app IN ($apps_string) ORDER BY platform", ARRAY_A);
+            $apps = $wpdb->get_results("SELECT a.id, a.link, a.orderBy, a.app, a.platform, b.name, b.imageName FROM {$ab_table} as a INNER JOIN {$b_table} as b ON a.BannerId = b.Id WHERE app IN ($apps_string) AND isActive = 1 ORDER BY platform", ARRAY_A);
 
             $_apps = array();
             foreach ($apps as $key => $app) {
@@ -25,9 +26,9 @@ if(!class_exists('AppConfigManage')) {
             }
             foreach ($_apps as $key => $app) {
                 foreach ($app as $_key => $platform) {
-                    $text = json_encode($platform);
+                    $text = $this->fn_generate_text_by_platform($platform);
                     $file_path = get_home_path() . 'wp-content/plugins/app_banners/config_files/';
-                    $file_name = $_key . '.' . $key . '.php';
+                    $file_name = $_key . '.' . $key . '.txt';
                     $fp = fopen($file_path . $file_name, "w");
                     fwrite($fp, $text);
                     fclose($fp);
@@ -37,6 +38,15 @@ if(!class_exists('AppConfigManage')) {
                 }
             }
             return true;
+        }
+        
+        private function fn_generate_text_by_platform($platform)
+        {
+            foreach($platform as $key => &$value) {
+                unset($value['platform']);
+                unset($value['app']);
+            }
+            return json_encode($platform);
         }
 
         private function fn_transfer_config_file($file_path, $file_name)

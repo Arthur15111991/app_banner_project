@@ -10,14 +10,19 @@ Author URI: https://vk.com/id28808075/
 include_once('config.class.php');
 if (!class_exists('AppBanners' && class_exists('AppBanners'))) {
 
-    class AppBanners extends AppBannersConfig 
+    class AppBanners extends AppBannersConfig
     {
         function __construct()
         {
             parent::__construct();
             add_action('admin_menu', array(&$this, 'fn_reg_admin_page'));
+            add_action('init', array(&$this, 'fn_do_output_buffer'));
         }
-
+		
+        public function fn_do_output_buffer() {
+            ob_start();
+        }
+		
         public function fn_reg_admin_page() 
         {
             $menu_page = add_menu_page(__('App Banners', BANNER_DOMAIN), __('App Banners', BANNER_DOMAIN), BANNER_ACCESS, 'app-banners', array(&$this, 'fn_manage_banners'));
